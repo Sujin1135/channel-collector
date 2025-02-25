@@ -12,8 +12,8 @@ type Channel struct {
 	TotalSubscriber int      `json:"totalSubscriber"`
 	TotalVideo      int      `json:"totalVideo"`
 	Joined          struct {
-		Year  int    `json:"year"`
-		Month string `json:"month"`
-		Date  string `json:"date"`
+		Year  int `json:"year"`
+		Month int `json:"month"`
+		Date  int `json:"date"`
 	} `json:"joined"`
 }
