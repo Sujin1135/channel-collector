@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/chromedp/chromedp"
 	"github.com/gocolly/colly/v2"
-	"github.com/pkg/errors"
 	"sync"
+	"time"
 )
 
 const (
@@ -56,7 +56,7 @@ const (
 
 type Collector struct {
 	collector   *colly.Collector
-	accessMutex *sync.Mutex
+	rateLimiter <-chan time.Time
 }
 
 func NewCollector() *Collector {
@@ -64,17 +64,19 @@ func NewCollector() *Collector {
 		collector: colly.NewCollector(
 			colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"),
 		),
-		accessMutex: &sync.Mutex{},
+		rateLimiter: time.Tick(1 * time.Second),
 	}
 }
 
-func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel, wg *sync.WaitGroup) {
+func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel, errCh chan<- error, wg *sync.WaitGroup) {
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 	defer close(ch)
+	defer close(errCh)
 	defer wg.Done()
 
 	for _, youtubeHandle := range youtubeHandles {
+		<-c.rateLimiter
 		fmt.Printf("start to access website by handle: %s\n", youtubeHandle)
 		fmt.Printf("end to access website by handle: %s\n", youtubeHandle)
 
@@ -88,7 +90,8 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 			chromedp.Evaluate(extractScript, &response),
 		)
 		if runErr != nil {
-			fmt.Println(errors.Wrap(runErr, fmt.Sprintf("failed to scrap channel data by handle %s", youtubeHandle)))
+			errCh <- runErr
+			continue
 		}
 
 		ch <- response
