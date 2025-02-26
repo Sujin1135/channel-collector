@@ -1,41 +1,30 @@
 package main
 
 import (
-	"channel-collector/internal/channel"
-	collector2 "channel-collector/internal/collector"
+	grpc2 "channel-collector/api/grpc/service"
+	"flag"
 	"fmt"
-	"github.com/pkg/errors"
-	"sync"
+	pb "github.com/Sujin1135/channel-collector-interface/protobuf/service"
+	"google.golang.org/grpc"
+	"log"
+	"net"
+)
+
+var (
+	port = flag.Int("port", 50051, "The server port")
 )
 
 func main() {
-	var wg sync.WaitGroup
-	wg.Add(1)
-	var dataWg sync.WaitGroup
-	dataWg.Add(2)
-
-	youtubeHandles := []string{"@xiae3067", "@ezcd"}
-	ch := make(chan *channel.Channel, len(youtubeHandles))
-	errCh := make(chan error, len(youtubeHandles))
-	collector := collector2.NewCollector()
-
-	go collector.Collect(youtubeHandles, ch, errCh, &wg)
-
-	go func() {
-		defer dataWg.Done()
-		for err := range errCh {
-			fmt.Println(errors.Wrap(err, "occurred an error when collect youtube channels"))
-		}
-	}()
-
-	go func() {
-		defer dataWg.Done()
-		for data := range ch {
-			fmt.Println("data as below:")
-			fmt.Println(data)
-		}
-	}()
-
-	wg.Wait()
-	dataWg.Wait()
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	channelService := grpc2.NewChannelService()
+	s := grpc.NewServer()
+	pb.RegisterChannelServiceServer(s, channelService)
+	log.Printf("server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }

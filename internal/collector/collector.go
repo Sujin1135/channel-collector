@@ -5,7 +5,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/chromedp/chromedp"
-	"github.com/gocolly/colly/v2"
 	"sync"
 	"time"
 )
@@ -55,15 +54,11 @@ const (
 )
 
 type Collector struct {
-	collector   *colly.Collector
 	rateLimiter <-chan time.Time
 }
 
 func NewCollector() *Collector {
 	return &Collector{
-		collector: colly.NewCollector(
-			colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"),
-		),
 		rateLimiter: time.Tick(1 * time.Second),
 	}
 }
