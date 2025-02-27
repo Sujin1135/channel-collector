@@ -73,7 +73,6 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 	for _, youtubeHandle := range youtubeHandles {
 		<-c.rateLimiter
 		fmt.Printf("start to access website by handle: %s\n", youtubeHandle)
-		fmt.Printf("end to access website by handle: %s\n", youtubeHandle)
 
 		var response *channel.Channel
 		runErr := chromedp.Run(ctx,
@@ -90,6 +89,8 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 		}
 
 		ch <- response
+
+		fmt.Printf("end to access website by handle: %s\n", youtubeHandle)
 	}
 }
 
