@@ -22,8 +22,7 @@ func NewChannelService() *ChannelService {
 func (s *ChannelService) GetChannels(request *service.GetChannelsRequest, stream service.ChannelService_GetChannelsServer) error {
 	var wg sync.WaitGroup
 	wg.Add(1)
-	var dataWg sync.WaitGroup
-	dataWg.Add(2)
+
 	ch := make(chan *channel.Channel, len(request.YoutubeHandles))
 	errCh := make(chan error, len(request.YoutubeHandles))
 
@@ -35,7 +34,6 @@ func (s *ChannelService) GetChannels(request *service.GetChannelsRequest, stream
 	}
 
 	wg.Wait()
-	dataWg.Wait()
 	return nil
 }
 
