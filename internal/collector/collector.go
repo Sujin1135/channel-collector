@@ -79,7 +79,6 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 			chromedp.Navigate(c.genChannelURL(youtubeHandle)),
 			chromedp.WaitVisible(".truncated-text-wiz__absolute-button", chromedp.NodeVisible),
 			chromedp.Click(".truncated-text-wiz__absolute-button", chromedp.NodeVisible),
-			chromedp.WaitVisible("#links-section", chromedp.NodeVisible),
 			chromedp.WaitVisible("#additional-info-container", chromedp.ByQuery),
 			chromedp.Evaluate(extractScript, &response),
 		)
