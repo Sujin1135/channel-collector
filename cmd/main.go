@@ -15,6 +15,7 @@ var (
 )
 
 func main() {
+	log.SetFlags(log.Ldate | log.Ltime)
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {

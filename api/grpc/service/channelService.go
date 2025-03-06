@@ -3,10 +3,10 @@ package service
 import (
 	"channel-collector/internal/channel"
 	"channel-collector/internal/collector"
-	"fmt"
 	"github.com/Sujin1135/channel-collector-interface/protobuf/entity"
 	"github.com/Sujin1135/channel-collector-interface/protobuf/service"
 	"github.com/pkg/errors"
+	"log"
 	"sync"
 )
 
@@ -30,7 +30,7 @@ func (s *ChannelService) GetChannels(request *service.GetChannelsRequest, stream
 
 	err := s.handleGetChannelsStreamResponses(stream, ch, errCh)
 	if err != nil {
-		fmt.Println("failed to send a stream message cause as follow:", err.Error())
+		log.Println("failed to send a stream message cause as follow:", err.Error())
 	}
 
 	wg.Wait()

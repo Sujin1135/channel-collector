@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/chromedp/chromedp"
+	"log"
 	"sync"
 	"time"
 )
@@ -72,7 +73,8 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 
 	for _, youtubeHandle := range youtubeHandles {
 		<-c.rateLimiter
-		fmt.Printf("start to access website by handle: %s\n", youtubeHandle)
+
+		log.Printf("start to access website by handle: %s\n", youtubeHandle)
 
 		var response *channel.Channel
 		runErr := chromedp.Run(ctx,
@@ -89,7 +91,7 @@ func (c *Collector) Collect(youtubeHandles []string, ch chan<- *channel.Channel,
 
 		ch <- response
 
-		fmt.Printf("end to access website by handle: %s\n", youtubeHandle)
+		log.Printf("end to access website by handle: %s\n", youtubeHandle)
 	}
 }
 
